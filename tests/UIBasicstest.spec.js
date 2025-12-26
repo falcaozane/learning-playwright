@@ -1,5 +1,4 @@
 const {test, expect} = require('@playwright/test');
-const { threadCpuUsage } = require('node:process');
 
 test('First Playwright Test', async ({browser})=>{
     // playwright code will go here
@@ -49,5 +48,24 @@ test('Second Playwright Test', async ({page})=>{
     console.log(await page.title())
 
     await expect(page).toHaveTitle("LoginPage Practise | Rahul Shetty Academy");
+
+});
+
+test('Third Playwright Test', async ({page})=>{
+
+    await page.goto("https://rahulshettyacademy.com/loginpagePractise/")
+    const username = page.locator("#username");
+    const password = page.locator("[type='password']");
+    const signInBtn = page.locator("#signInBtn");
+    const dropdown = page.locator("select.form-control");
+    const radioBtn = page.locator(".radiotextsty").last();
+
+    await username.fill("rahulshettyacademy")
+    await password.fill("learning")
+    await dropdown.selectOption("consult") // value , label, index
+    await radioBtn.click();
+    await page.locator("#okayBtn").click();
+    await page.pause();
+    await signInBtn.click();
 
 });
