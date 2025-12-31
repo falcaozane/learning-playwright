@@ -59,13 +59,20 @@ test('Third Playwright Test', async ({page})=>{
     const signInBtn = page.locator("#signInBtn");
     const dropdown = page.locator("select.form-control");
     const radioBtn = page.locator(".radiotextsty").last();
+    const checkBox = page.locator("#terms");
 
     await username.fill("rahulshettyacademy")
     await password.fill("learning")
     await dropdown.selectOption("consult") // value , label, index
     await radioBtn.click();
     await page.locator("#okayBtn").click();
-    await page.pause();
+    console.log(await radioBtn.isChecked());
+    await expect(radioBtn).toBeChecked();
+    await checkBox.click();
+    console.log(await checkBox.isChecked());
+    await expect(checkBox).toBeChecked();
+    await checkBox.uncheck();
+    expect( await checkBox.isChecked()).toBeFalsy();
     await signInBtn.click();
 
 });
