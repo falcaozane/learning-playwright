@@ -60,6 +60,7 @@ test('Third Playwright Test', async ({page})=>{
     const dropdown = page.locator("select.form-control");
     const radioBtn = page.locator(".radiotextsty").last();
     const checkBox = page.locator("#terms");
+    const documentLink = page.locator("[href*='documents-request']");
 
     await username.fill("rahulshettyacademy")
     await password.fill("learning")
@@ -73,6 +74,24 @@ test('Third Playwright Test', async ({page})=>{
     await expect(checkBox).toBeChecked();
     await checkBox.uncheck();
     expect( await checkBox.isChecked()).toBeFalsy();
+    await expect(documentLink).toHaveAttribute("class","blinkingText");
     await signInBtn.click();
+
+});
+
+test('Fourth Playwright Test', async ({browser})=>{
+
+    const context = await browser.newContext();
+    const page =  await context.newPage();
+    await page.goto("https://rahulshettyacademy.com/loginpagePractise/")
+    const documentLink = page.locator("[href*='documents-request']");
+    const [newPage] = await Promise.all([
+        context.waitForEvent('page'),
+        await documentLink.click(), // Opens a new tab
+    ]);
+
+    const text = await newPage.locator(".red").textContent();
+
+    console.log(text);
 
 });
