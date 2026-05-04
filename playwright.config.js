@@ -1,5 +1,7 @@
 // @ts-check
 
+const { trace } = require("node:console");
+
 
 /**
  * @see https://playwright.dev/docs/test-configuration
@@ -21,7 +23,9 @@ const config = ({
     viewport: null, // Set viewport to null to allow maximization
     launchOptions: {
       args: ['--start-maximized'], // Use the start-maximized argument
-    }
+    },
+    screenshot: 'on',
+    trace: 'on', // retain-on-failure, off, on, on-first-retry, on-all-retries
   },
   
 });
