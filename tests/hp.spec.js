@@ -1,34 +1,72 @@
-const { test, expect } = require('@playwright/test');
+const { test } = require('@playwright/test');
+const XLSX = require('xlsx');
 
-test('HP validations', async ({ page }) => {
-    await page.goto('https://h20195.www2.hp.com/v2/library.aspx?doctype=95&footer=95&filter_doctype=no&showregionfacet=yes&filter_country=no&cc=us&lc=en&filter_oid=no&filter_prodtype=rw&prodtype=ij&showproductcompatibility=yes&showregion=yes&showreglangcol=yes&showdescription=yes%23doctype-95&sortorder-popular&teasers-off&isRetired-false&isRHParentNode-false&titleCheck-false#doctype-95&sortorder-popular&teasers-off&isRetired-false&isRHParentNode-false&titleCheck-false');
+test('HP validations - Data Driven', async ({ page }) => {
 
-    const searchBox = page.locator('#txtSearch');
-    await searchBox.fill('HP ZBook Fury 16 G11');
+    // 👉 Read Excel
+    const workbook = XLSX.readFile('models.xlsx');
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const data = XLSX.utils.sheet_to_json(sheet);
 
-    const searchBtn = page.locator("//a[text()='Go']");
-    await searchBtn.click();
+    const results = [];
 
-    // Wait for NEW search result
-    await page.waitForSelector('td.docuname a:has-text("ZBook Fury 16 G11")');
+    for (const rowData of data) {
 
-    const rows = page.locator('tbody#data tr.withsnippet');
-    const count = await rows.count();
+        const model = rowData['Models Name'];
+        console.log(`\nSearching for: ${model}`);
 
-    for (let i = 0; i < count; i++) {
-        const row = rows.nth(i);
+        await page.goto('https://h20195.www2.hp.com/v2/library.aspx?doctype=95&footer=95&cc=us&lc=en');
 
-        // Product name
-        const name = await row.locator('td.docuname a').innerText();
+        // Search
+        await page.fill('#txtSearch', model);
+        await page.click("//a[text()='Go']");
 
-        // PDF link (first anchor inside docuaction)
-        const link = await row.locator('td.docuaction a[href*="GetDocument"]').first().getAttribute('href');
+        await page.waitForTimeout(3000);
 
-        // Convert to full URL
-        const fullLink = new URL(link, page.url()).href;
+        const rows = page.locator('tbody#data tr.withsnippet');
+        const count = await rows.count();
 
-        console.log(`Product: ${name}`);
-        console.log(`PDF Link: ${fullLink}`);
-        console.log('----------------------');
+        let links = [];
+
+        for (let i = 0; i < count; i++) {
+            const row = rows.nth(i);
+
+            const name = await row.locator('td.docuname a').innerText();
+
+            if (name.toLowerCase().includes(model.toLowerCase())) {
+                const link = await row
+                    .locator('td.docuaction a[href*="GetDocument"]')
+                    .first()
+                    .getAttribute('href');
+
+                if (link) {
+                    const fullLink = new URL(link, page.url()).href;
+                    links.push(fullLink);
+                }
+            }
+        }
+
+        // 👉 Handle result cases
+        if (links.length === 0) {
+            results.push({
+                Model: model,
+                Links: 'NOT FOUND'
+            });
+        } else {
+            results.push({
+                Model: model,
+                Links: links.join('\n') // multiple links
+            });
+        }
     }
+
+    // 👉 Write output Excel
+    const newSheet = XLSX.utils.json_to_sheet(results);
+    const newWorkbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(newWorkbook, newSheet, 'Results');
+
+    XLSX.writeFile(newWorkbook, 'output.xlsx');
+
+    console.log('\n✅ Execution completed. Check output.xlsx');
 });
