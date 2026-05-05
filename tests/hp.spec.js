@@ -12,10 +12,10 @@ test('HP validations - Data Driven', async ({ page }) => {
 
     for (const rowData of data) {
 
-        const model = rowData['Models Name'];
+        const model = rowData['Model Name'];
         console.log(`\nSearching for: ${model}`);
 
-        await page.goto('https://h20195.www2.hp.com/v2/library.aspx?doctype=95&footer=95&cc=us&lc=en');
+        await page.goto('https://h20195.www2.hp.com/v2/library.aspx?doctype=95&footer=95&filter_doctype=no&showregionfacet=yes&filter_country=no&cc=us&lc=en&filter_oid=no&filter_prodtype=rw&prodtype=ij&showproductcompatibility=yes&showregion=yes&showreglangcol=yes&showdescription=yes%23doctype-95&sortorder-popular&teasers-off&isRetired-false&isRHParentNode-false&titleCheck-false#doctype-95&sortorder-popular&teasers-off&isRetired-false&isRHParentNode-false&titleCheck-false');
 
         // Search
         await page.fill('#txtSearch', model);
