@@ -9,21 +9,26 @@ test('HP validations', async ({ page }) => {
     const searchBtn = page.locator("//a[text()='Go']");
     await searchBtn.click();
 
-    // Wait for results to load (table rows appear)
-    await page.waitForSelector('td.docuname a');
+    // Wait for NEW search result
+    await page.waitForSelector('td.docuname a:has-text("ZBook Fury 16 G11")');
 
-    // Get all matching elements
-    const products = page.locator('td.docuname a');
-    const count = await products.count();
+    const rows = page.locator('tbody#data tr.withsnippet');
+    const count = await rows.count();
 
     for (let i = 0; i < count; i++) {
-        const product = products.nth(i);
+        const row = rows.nth(i);
 
-        const name = await product.innerText();
-        const link = await product.getAttribute('href');
+        // Product name
+        const name = await row.locator('td.docuname a').innerText();
+
+        // PDF link (first anchor inside docuaction)
+        const link = await row.locator('td.docuaction a[href*="GetDocument"]').first().getAttribute('href');
+
+        // Convert to full URL
+        const fullLink = new URL(link, page.url()).href;
 
         console.log(`Product: ${name}`);
-        console.log(`Link: ${link}`);
+        console.log(`PDF Link: ${fullLink}`);
         console.log('----------------------');
     }
 });
