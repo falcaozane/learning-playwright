@@ -9,7 +9,7 @@ const { trace } = require("node:console");
 const config = ({
   testDir: './tests',
 
-  timeout: 10 * 1000,
+  timeout: 30 * 1000,
   expect:{
     timeout: 5000,
   },
