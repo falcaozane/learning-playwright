@@ -21,6 +21,7 @@ const config = ({
     browserName:'chromium',
     headless: false,
     viewport: null, // Set viewport to null to allow maximization
+    ignoreHTTPSErrors: true,
     launchOptions: {
       args: ['--start-maximized'], // Use the start-maximized argument
     },

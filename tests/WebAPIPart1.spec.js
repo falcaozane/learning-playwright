@@ -1,6 +1,7 @@
 const { test, expect , request} = require('@playwright/test');
 
 const loginPayload = {userEmail : "anshika@gmail.com", userPassword : "Iamking@000"};
+let token;
 
 test.beforeAll( async()=>{
 
@@ -12,6 +13,7 @@ test.beforeAll( async()=>{
 
     expect(loginResponse.ok()).toBeTruthy();
     const loginResponseJson = await loginResponse.json();
+    token = loginResponseJson.token;
     console.log(loginResponseJson.token);
     console.log(loginResponseJson.userId);
     console.log(loginResponseJson.message);
@@ -25,26 +27,31 @@ test.beforeEach(()=>{
  
  
  
-test('@Webst Client App login', async ({ page }) => {
+test('Place the order', async ({ page }) => {
    //js file- Login js, DashboardPage
-   const email = "anshika@gmail.com";
+
+   page.addInitScript(value=>{
+    window.localStorage.setItem("token", value);
+   },token)
+   
+//    await page.goto("https://rahulshettyacademy.com/client");
+//    await page.getByPlaceholder("email@example.com").fill(email);
+//    await page.getByPlaceholder("enter your passsword").fill("Iamking@000");
+//    await page.getByRole('button',{name:"Login"}).click();
+//    await page.waitForLoadState('networkidle');
+
    const productName = 'ZARA COAT 3';
-   const products = page.locator(".card-body");
    await page.goto("https://rahulshettyacademy.com/client");
-   await page.getByPlaceholder("email@example.com").fill(email);
-   await page.getByPlaceholder("enter your passsword").fill("Iamking@000");
-   await page.getByRole('button',{name:"Login"}).click();
-   await page.waitForLoadState('networkidle');
+   const products = page.locator(".card-body");
    await page.locator(".card-body b").first().waitFor();
    
-   await page.locator(".card-body").filter({hasText:"ZARA COAT 3"})
-   .getByRole("button",{name:"Add to Cart"}).click();
+   await page.locator(".card-body").filter({hasText:"ZARA COAT 3"}).getByRole("button",{name:"Add to Cart"}).click();
  
    await page.getByRole("listitem").getByRole('button',{name:"Cart"}).click();
  
    //await page.pause();
    await page.locator("div li").first().waitFor();
-   await expect(page.getByText("ZARA COAT 3")).toBeVisible();
+   await expect(page.getByText(productName)).toBeVisible();
  
    await page.getByRole("button",{name :"Checkout"}).click();
  
