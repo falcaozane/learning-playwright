@@ -1,23 +1,18 @@
 const { test, expect , request} = require('@playwright/test');
+const {APiUtils} = require('./utils/APiUtils');
 
 const loginPayload = {userEmail : "anshika@gmail.com", userPassword : "Iamking@000"};
-let token;
+
+const orderPayload = {orders : [{country : "India", productOrderedId : "6960eae1c941646b7a8b3ed3"}]};
+
+let response;
 
 test.beforeAll( async()=>{
 
     const apiContext = await request.newContext();
 
-    const loginResponse = await apiContext.post("https://rahulshettyacademy.com/api/ecom/auth/login",{
-        data : loginPayload
-    })
-
-    expect(loginResponse.ok()).toBeTruthy();
-    const loginResponseJson = await loginResponse.json();
-    token = loginResponseJson.token;
-    console.log(loginResponseJson.token);
-    console.log(loginResponseJson.userId);
-    console.log(loginResponseJson.message);
-
+    const apiUtils = new APiUtils(apiContext, loginPayload)
+    response = await apiUtils.createOrder(orderPayload);
 });
 
 test.beforeEach(()=>{
@@ -27,38 +22,32 @@ test.beforeEach(()=>{
  
  
  
-test('Place the order', async ({ page }) => {
-   //js file- Login js, DashboardPage
+test("Place the order", async ({page})=>
+{
+    
+    page.addInitScript(value=>{
+        window.localStorage.setItem('token',value);
+ 
+    },response.token);
+      await page.goto("https://rahulshettyacademy.com/client/");
+    const orderHistory = await page.locator("nav [routerLink*='myorders']");
+    await orderHistory.click();
+    await page.locator("tbody").waitFor();
+    const rows = page.locator("tbody tr");
+    const rowCount = await rows.count();
+    for (let i = 0; i < rowCount; i++) {
+ 
+        const rowOrderID = await rows.nth(i).locator("th").textContent();
+        if (response.orderID.includes(rowOrderID)) {
+            await rows.nth(i).locator("td .btn-primary").click();
+            break;
+        }
+ 
+    }
+    const orderIDDetails=await page.locator(".col-text").textContent();
+    //assertion to check if order ID is correct.
+    expect (response.orderID.includes(orderIDDetails)).toBeTruthy();
+});
 
-   page.addInitScript(value=>{
-    window.localStorage.setItem("token", value);
-   },token)
-   
-//    await page.goto("https://rahulshettyacademy.com/client");
-//    await page.getByPlaceholder("email@example.com").fill(email);
-//    await page.getByPlaceholder("enter your passsword").fill("Iamking@000");
-//    await page.getByRole('button',{name:"Login"}).click();
-//    await page.waitForLoadState('networkidle');
-
-   const productName = 'ZARA COAT 3';
-   await page.goto("https://rahulshettyacademy.com/client");
-   const products = page.locator(".card-body");
-   await page.locator(".card-body b").first().waitFor();
-   
-   await page.locator(".card-body").filter({hasText:"ZARA COAT 3"}).getByRole("button",{name:"Add to Cart"}).click();
- 
-   await page.getByRole("listitem").getByRole('button',{name:"Cart"}).click();
- 
-   //await page.pause();
-   await page.locator("div li").first().waitFor();
-   await expect(page.getByText(productName)).toBeVisible();
- 
-   await page.getByRole("button",{name :"Checkout"}).click();
- 
-   await page.getByPlaceholder("Select Country").pressSequentially("ind");
- 
-   await page.getByRole("button",{name :"India"}).nth(1).click();
-   await page.getByText("PLACE ORDER").click();
- 
-   await expect(page.getByText("Thankyou for the order.")).toBeVisible();
-})
+// verify if order created is showing in history page or not
+// Precondition - create order
