@@ -70,18 +70,3 @@ test('@Webst Client App login', async ({ page }) => {
    expect(orderId.includes(orderIdDetails)).toBeTruthy();
  
 });
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
