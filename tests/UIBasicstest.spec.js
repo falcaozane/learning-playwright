@@ -4,6 +4,8 @@ test('First Playwright Test', async ({browser})=>{
     // playwright code will go here
     const context = await browser.newContext();
     const page =  await context.newPage();
+    // page.route('**/*.css', route =>route.abort()) // blocking css calls 
+    // page.route('**/*.{jpg,jpeg,png}', route =>route.abort()) // block image calls
     await page.goto("https://rahulshettyacademy.com/loginpagePractise/")
     console.log(page.title())
 
@@ -18,6 +20,8 @@ test('First Playwright Test', async ({browser})=>{
 
     const cardTitles = page.locator(".card-title a");
 
+    page.on('request', request => console.log(request.url())); // check all the requests
+    page.on('response', response=> console.log(response.url(), response.status())) // checking all the responses
 
     await username.fill("rahulshetty")
     await password.fill("learning")
