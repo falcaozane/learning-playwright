@@ -21,3 +21,13 @@ test('Popup validations', async ({page}) => {
     const subs = await framesPage.locator('.text h2').textContent()
     console.log(subs.split(" ")[1])
 })
+
+test( "Screenshot and Visual Comparison", async({page})=>{
+    await page.goto('https://rahulshettyacademy.com/AutomationPractice/')
+
+    await expect(page.locator('#displayed-text')).toBeVisible()
+    await page.locator('#displayed-text').screenshot({path:"screenshot_element.png"})
+    await page.locator('#hide-textbox').click()
+    await page.screenshot({path:"screenshot.png"})
+    await expect(page.locator('#displayed-text')).toBeHidden()
+})
