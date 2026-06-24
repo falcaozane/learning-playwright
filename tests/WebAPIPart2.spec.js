@@ -8,26 +8,27 @@ let webContext;
 test.beforeAll( async({browser})=>{
     const context = await browser.newContext()
     const page = await context.newPage();
-    const email = "anshika@gmail.com";
+    const email = "zanefalcao21@gmail.com";
     await page.goto("https://rahulshettyacademy.com/client");
     await page.locator("#userEmail").fill(email);
-    await page.locator("#userPassword").fill("Iamking@000");
+    await page.locator("#userPassword").fill("Zane210803#");
     await page.locator("#login").click();
     await page.waitForLoadState('networkidle');
     await context.storageState({path : 'state.json'});
 
     webContext = await browser.newContext({storageState : 'state.json'});
     // webContext = context;
+    await page.locator(".card-body b").first().waitFor();
 })
  
 test('@Webst Client App login', async () => {
    //js file- Login js, DashboardPage
    
    const page = await webContext.newPage();
-   await page.waitForLoadState('networkidle');
+   await page.goto("https://rahulshettyacademy.com/client/#/dashboard/dash");
    const productName = 'ZARA COAT 3';
    const products = page.locator(".card-body");
-   // await page.locator(".card-body").first().waitFor();
+   //await page.locator(".card-body").first().waitFor();
    const titles = await page.locator(".card-body b").allTextContents();
    console.log(titles); 
 //    const count = await products.count();
