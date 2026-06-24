@@ -31,3 +31,11 @@ test( "Screenshot and Visual Comparison", async({page})=>{
     await page.screenshot({path:"screenshot.png"})
     await expect(page.locator('#displayed-text')).toBeHidden()
 })
+
+// screenshot1 -> store -> screenshot2 compare screenshots for visual testing
+
+test('visual', async({page})=>{
+
+    await page.goto("https://google.com/")
+    expect(await page.screenshot()).toMatchSnapshot('landing-win32.png')
+})
