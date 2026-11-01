@@ -11,7 +11,7 @@ test.beforeAll( async({browser})=>{
     const email = "zanefalcao21@gmail.com";
     await page.goto("https://rahulshettyacademy.com/client");
     await page.locator("#userEmail").fill(email);
-    await page.locator("#userPassword").fill("Zane210803#");
+    await page.locator("#userPassword").fill("password");
     await page.locator("#login").click();
     await page.waitForLoadState('networkidle');
     await context.storageState({path : 'state.json'});

@@ -1,7 +1,7 @@
 const { test, expect , request} = require('@playwright/test');
 const {APiUtils} = require('./utils/APiUtils');
 
-const loginPayload = {userEmail : "zanefalcao21@gmail.com", userPassword : "Zane210803#"};
+const loginPayload = {userEmail : "zanefalcao21@gmail.com", userPassword : "password"};
 
 const orderPayload = {orders : [{country : "India", productOrderedId : "6960eae1c941646b7a8b3ed3"}]};
 
@@ -29,7 +29,8 @@ test("Place the order", async ({page})=>
         window.localStorage.setItem('token',value);
  
     },response.token);
-      await page.goto("https://rahulshettyacademy.com/client/");
+      
+    await page.goto("https://rahulshettyacademy.com/client/");
     const orderHistory = await page.locator("nav [routerLink*='myorders']");
     await orderHistory.click();
     await page.locator("tbody").waitFor();

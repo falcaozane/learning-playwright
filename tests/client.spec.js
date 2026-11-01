@@ -12,7 +12,7 @@ test('@Webst Client App login', async ({ page }) => {
    const products = page.locator(".card-body");
    await page.goto("https://rahulshettyacademy.com/client");
    await page.locator("#userEmail").fill(email);
-   await page.locator("#userPassword").fill("Zane210803#");
+   await page.locator("#userPassword").fill("password");
    await page.locator("[value='Login']").click();
    await page.waitForLoadState('networkidle');
    await page.locator(".card-body b").first().waitFor();
